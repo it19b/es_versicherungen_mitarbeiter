@@ -40,10 +40,28 @@ class SQL {
 
     }
 
-    function GetEmployees() {
+    function DeleteEmployee($id) {
+            $conn = $this->GetConnection();
+
+            $query = "DELETE FROM Mitarbeiter WHERE id=$id";
+            return $conn->query($query);
+    }
+
+    function GetEmployees($id = NULL) {
         $conn = $this->GetConnection();
  
-        $query = "SELECT * FROM Mitarbeiter";
+        if ($id) {
+            $query = "SELECT * FROM Mitarbeiter WHERE id=$id";
+        } else {
+            $query = "SELECT * FROM Mitarbeiter";
+        }
+        return $conn->query($query);
+    }
+
+    function GetDepartments() {
+        $conn = $this->GetConnection();
+ 
+        $query = "SELECT ID, Bezeichnung FROM Abteilung";
         return $conn->query($query);
     }
 

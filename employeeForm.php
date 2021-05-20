@@ -3,10 +3,17 @@
 include 'SQL.php';
 
 $result = null;
-$sql = new SQL();
+$sql = new SQL;
+$id = $_GET["id"];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $result = $sql->InsertEntry($_POST);
+  $result = $sql->EmployeeDataHandler($_POST);
+  
+  if ($result === true) {
+    // redirect to all posts
+    header('Location: ' . "/es_versicherungen_mitarbeiter/employees.php");
+    die();
+  }
 }
 
 function GetDepartmentOptions() {
@@ -24,12 +31,12 @@ function GetDepartmentOptions() {
   return $options;
 }
 
-$id = $_GET["id"];
 
 if ($id) {
   $result = $sql->GetEmployees($id);
   $row = $result->fetch_assoc();
 
+  $employeenumber = $row["Personalnummer"];
   $name = $row["Name"];
   $firstname = $row["Vorname"];
   $birthday = $row["Geburtsdatum"];
@@ -40,11 +47,13 @@ if ($id) {
   $isLeader = $row["Ist_Leiter"];
   $departmentId = $row["Abteilung_ID"];
 } else {
-  $name = $firstname = $birthday =  $phone = $mobil = $email = $room = $isLeader = $departmentId = "";
+  $employeenumber = $name = $firstname = $birthday =  $phone = $mobil = $email = $room = $isLeader = $departmentId = "";
 }
 
 $departmentOptions = GetDepartmentOptions();
 
+$postfix = $id ? "bearbeiten" : "erstellen";
+$isLeaderValue = $isLeader === "J" ? "checked" : "";
 
 ?>
 <!DOCTYPE HTML>  
@@ -54,10 +63,14 @@ $departmentOptions = GetDepartmentOptions();
 <body>
 
 
-<h2>Mitarbeiter bearbeiten</h2>
+<h2>Mitarbeiter <?php echo $postfix ?></h2>
+
 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">  
   <?php
   $formBody = "
+  <input type='hidden' name='employeeId' value='$id'>
+  <input type='number' name='employeenumber' placeholder='Personalnummer' value='$employeenumber'>
+  <br><br>
   <input type='text' name='name' placeholder='Name' value='$name'>
   <br><br>
   <input type='text' name='firstname' placeholder='Vorname' value='$firstname'>
@@ -72,7 +85,7 @@ $departmentOptions = GetDepartmentOptions();
   <br><br>
   <input type='number' placeholder='Raumnummer' name='room' value='$room'>
   <br><br>
-  <input type='checkbox' name='is_leader' value='$isLeader'>
+  <input type='checkbox' name='is_leader' $isLeaderValue>
   <label for='is_leader'>Leitung</label>
   <br><br>
   <label for='department'>Abteilung:</label>
@@ -89,18 +102,6 @@ $departmentOptions = GetDepartmentOptions();
 </form>
 
 <h5><small>Felder mit einem *, sind Pflichtfelder</small></h5>
-
-<?php
-
-if ($result === true) {
-  // redirect to all posts
-  header('Location: ' . "/es_php_guestbook/posts.php");
-  die();
-} elseif (is_string($result)) {
-  ?> <h3> <?php $result ?> </h3> <?php
-} 
-
-?>
 
 </body>
 </html>

@@ -12,21 +12,67 @@ class SQL {
     }
 
 
-    function InsertEntry($postRequest) {
+    function EmployeeDataHandler($postRequest, $id=NULL) {
 
         $conn = $this->GetConnection();
 
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
         }
-
+        $id = $this->ParseInput($postRequest["employeeId"]);
+        $employeenumber = $this->ParseInput($postRequest["employeenumber"]);
         $name = $this->ParseInput($postRequest["name"]);
+        $firstname = $this->ParseInput($postRequest["firstname"]);
+        $birthday = $this->ParseInput($postRequest["birthday"]);
+        $phone = $this->ParseInput($postRequest["phone"]);
+        $mobil = $this->ParseInput($postRequest["mobile"]);
         $email = $this->ParseInput($postRequest["email"]);
-        $website = $this->ParseInput($postRequest["website"]);
-        $comment = $this->ParseInput($postRequest["comment"]);
-        $gender = $this->ParseInput($postRequest["gender"]);
+        $room = $this->ParseInput($postRequest["room"]);
+        $isLeader = isset($postRequest["is_leader"]) ? "J" : "N";
+        $departmentId = $this->ParseInput($postRequest["department"]);
 
-        $sql = "INSERT INTO guestbook (name, email, website, comment, gender) VALUES ('$name', '$email', '$website', '$comment', '$gender')";
+
+        if ($id) {
+            // Eintrag ändern
+            $sql = "UPDATE `Mitarbeiter` SET 
+                `Personalnummer` = '$employeenumber',
+                `Name` = '$name',
+                `Vorname` = '$firstname',
+                `Geburtsdatum` = '$birthday',
+                `Telefon` = '$phone',
+                `Mobil` = '$mobil',
+                `Email` = '$email',
+                `Raum` = '$room',
+                `Ist_Leiter` = '$isLeader',
+                `Abteilung_ID` = '$departmentId'
+                WHERE (`ID` = '$id');";
+
+        } else {
+            // Eintrag neu einfügen
+            $sql = "INSERT INTO guestbook (
+                Personalnummer,
+                Name,
+                Vorname,
+                Geburtsdatum,
+                Telefon,
+                Mobil,
+                Email,
+                Raum,
+                Ist_Leiter,
+                Abteilung_ID
+            ) VALUES (
+                '$name',
+                '$firstname',
+                '$birthday',
+                '$phone',
+                '$mobil',
+                '$email',
+                '$room',
+                '$isLeader',
+                '$departmentId',
+                )";
+
+        }
 
         $result = true;
 

@@ -9,6 +9,7 @@ $id = $_GET["id"];
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $result = $sql->EmployeeDataHandler($_POST);
   
+  echo $result;
   if ($result === true) {
     // redirect to all posts
     header('Location: ' . "/es_versicherungen_mitarbeiter/employees.php");

@@ -1,0 +1,2 @@
+ALTER TABLE `versicherungen`.`Mitarbeiter` 
+CHANGE COLUMN `ID` `ID` INT(11) NOT NULL AUTO_INCREMENT ;

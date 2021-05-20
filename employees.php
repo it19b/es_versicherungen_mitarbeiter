@@ -2,6 +2,7 @@
 include 'SQL.php';
 $sql = new SQL();
 $result = $sql->GetEmployees();
+$formPath = "employeeForm.php";
 ?>
 
 <html>
@@ -10,14 +11,16 @@ $result = $sql->GetEmployees();
   <script src="js/delete.js"></script>
 </head>
 <body>
-<h2>Mitarbeiter</h2>
+<h2>Mitarbeiter <button onclick='location.href ="<?php echo ("$formPath"); ?>";' >
+                  Erstellen
+                </button></h2>
 <?php 
 
 if ($result->num_rows > 0) {
-  $formPath = "employeeForm.php";
   // output data of each row
   while($row = $result->fetch_assoc()) {
     $id = $row['ID'];
+    $employeeNumber = $row['Personalnummer'];
     $name = $row["Name"];
     $vorname = $row["Vorname"];
     $geburtsdatum = $row["Geburtsdatum"];
@@ -32,11 +35,12 @@ if ($result->num_rows > 0) {
     $html = "
       <div id='employee-$id'>
         <h3>$name, $vorname
-            <a href='$formPath?id={$id}'>
-                <button>Bearbeiten</button>
-            </a>
-              <button onclick='deleteEmployee($id)'>Löschen</button>
+                <button onclick='location.href = \"$formPath?id={$id}\";' >
+                  Bearbeiten
+                </button>
+            <button onclick='deleteEmployee($id)'>Löschen</button>
         </h3>
+        <h5>Personalnummer: $employeeNumber</h5>
         <h5>Geburtstag: $geburtsdatum</h5>
         <h5>Telefon: $telefon</h5>
         <h5>Mobil: $mobil</h5>

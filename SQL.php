@@ -49,18 +49,19 @@ class SQL {
 
         } else {
             // Eintrag neu einfügen
-            $sql = "INSERT INTO guestbook (
-                Personalnummer,
-                Name,
-                Vorname,
-                Geburtsdatum,
-                Telefon,
-                Mobil,
-                Email,
-                Raum,
-                Ist_Leiter,
-                Abteilung_ID
+            $sql = "INSERT INTO `Mitarbeiter` (
+                `Personalnummer`,
+                `Name`,
+                `Vorname`,
+                `Geburtsdatum`,
+                `Telefon`,
+                `Mobil`,
+                `Email`,
+                `Raum`,
+                `Ist_Leiter`,
+                `Abteilung_ID`
             ) VALUES (
+                '$employeenumber',
                 '$name',
                 '$firstname',
                 '$birthday',
@@ -69,9 +70,8 @@ class SQL {
                 '$email',
                 '$room',
                 '$isLeader',
-                '$departmentId',
+                '$departmentId'
                 )";
-
         }
 
         $result = true;

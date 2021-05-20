@@ -4,7 +4,11 @@ $sql = new SQL();
 $result = $sql->GetEmployees();
 ?>
 
-<htlm>
+<html>
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="js/delete.js"></script>
+</head>
 <body>
 <h2>Mitarbeiter</h2>
 <?php 
@@ -13,6 +17,7 @@ if ($result->num_rows > 0) {
   $formPath = "employeeForm.php";
   // output data of each row
   while($row = $result->fetch_assoc()) {
+    $id = $row['ID'];
     $name = $row["Name"];
     $vorname = $row["Vorname"];
     $geburtsdatum = $row["Geburtsdatum"];
@@ -25,13 +30,12 @@ if ($result->num_rows > 0) {
 
 
     $html = "
+      <div id='employee-$id'>
         <h3>$name, $vorname
-            <a href='$formPath?id={$row['ID']}'>
+            <a href='$formPath?id={$id}'>
                 <button>Bearbeiten</button>
             </a>
-            <a href='$formPath?id={$row['ID']}'>
-                <button>Löschen</button>
-            </a>
+              <button onclick='deleteEmployee($id)'>Löschen</button>
         </h3>
         <h5>Geburtstag: $geburtsdatum</h5>
         <h5>Telefon: $telefon</h5>
@@ -43,6 +47,7 @@ if ($result->num_rows > 0) {
 
         
         <hr>
+      </div>
     ";
     echo $html;
     

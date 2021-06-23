@@ -11,6 +11,7 @@ $formPath = "employeeForm.php";
   <script src="js/delete.js"></script>
 </head>
 <body>
+<a href="/es_versicherungen_mitarbeiter/view.php?db=Mitarbeiter">click me hard</a>
 <h2>Mitarbeiter <button onclick='location.href ="<?php echo ("$formPath"); ?>";' >
                   Erstellen
                 </button></h2>

@@ -2,22 +2,107 @@
 
 class SQL {
     
-    function GetConnection() {
-        $servername = "localhost";
-        $username = "admin";
-        $password = "admin";
-        $database = "versicherungen";
+    public $conn; 
+    public $tableName;
 
-        return new mysqli($servername, $username, $password, $database); 
+    public function __construct($tableName)
+    {
+        $this->conn = new mysqli("localhost", "admin", "admin", "versicherungen");
+        $this->tableName = $tableName;
+    }
+
+    function GetTableNames() {
+        return array_column($this->conn->query('SHOW TABLES')->fetch_all(),0);
+    }
+
+    function GetTableHeaders() {
+        $tableName = $this->tableName;
+
+        $query = $this->conn->query("
+            SELECT COLUMN_NAME
+            FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_NAME = '$tableName'
+            ORDER BY ORDINAL_POSITION
+        ");
+
+        while($row = $query->fetch_assoc()){
+            $result[] = $row;
+        }
+
+        return array_column($result, 'COLUMN_NAME');
+
+    }
+
+    function GetTableRows() {
+        $tableName = $this->tableName;
+
+        $query = "SELECT * FROM $tableName";
+        return $this->conn->query($query);
+    }
+
+    function handleFormData($formData) {
+
+        $tableName = $this->tableName;
+        $keys = array_keys($formData);
+        $lastElement = end($keys);
+
+        if (isset($formData["id"])) {
+            //update
+            $queryBody = "";
+
+            foreach ($keys as $key) {
+                if ($key == "db" or $key == "id") { 
+                    continue;
+                };
+
+                $data = $formData[$key];
+
+                $delimeter = ",";
+
+                if ($lastElement == $key) {
+                    $delimeter = "";
+                }
+
+                $queryBody .= "`$key` = '$data' $delimeter";
+
+            }
+            $id = $formData["id"];
+
+            $query = "UPDATE `$tableName` SET $queryBody WHERE (`ID` = '$id');";
+        } else {
+            //create
+
+
+            $columns = "";
+            $values = "";
+
+            foreach($keys as $key) {
+                if ($key == "db" or $key == "id") { 
+                    continue;
+                };
+                 $delimeter = ",";
+
+                if ($lastElement == $key) {
+                    $delimeter = "";
+                }
+
+                $columns .= "`$key` $delimeter";
+                $value = $formData[$key];
+                $values .= "'$value' $delimeter";
+            }
+            
+            $query = "INSERT INTO `$tableName` ($columns) VALUES ($values);";
+        }
+
+
+        return $this->conn->query($query);
     }
 
 
     function EmployeeDataHandler($postRequest, $id=NULL) {
 
-        $conn = $this->GetConnection();
-
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
+        if ($this->conn->connect_error) {
+            die("Connection failed: " . $this->conn->connect_error);
         }
         $id = $this->ParseInput($postRequest["employeeId"]);
         $employeenumber = $this->ParseInput($postRequest["employeenumber"]);
@@ -76,39 +161,36 @@ class SQL {
 
         $result = true;
 
-        if ($conn->query($sql) === false) {
-            $result = "Error: " . $sql . "<br>" . $conn->error;
+        if ($this->conn->query($sql) === false) {
+            $result = "Error: " . $sql . "<br>" . $this->conn->error;
         }
 
-        $conn->close();
+        $this->conn->close();
 
         return $result;
 
     }
 
-    function DeleteEmployee($id) {
-            $conn = $this->GetConnection();
+    function DeleteEntry($id) {
 
-            $query = "DELETE FROM Mitarbeiter WHERE id=$id";
-            return $conn->query($query);
+        $tableName = $this->tableName;
+        $query = "DELETE FROM $tableName WHERE id=$id";
+        return $this->conn->query($query);
     }
 
-    function GetEmployees($id = NULL) {
-        $conn = $this->GetConnection();
+    function GetEntry($id, $tableName = NULL) {
  
-        if ($id) {
-            $query = "SELECT * FROM Mitarbeiter WHERE id=$id";
-        } else {
-            $query = "SELECT * FROM Mitarbeiter";
+        if ($tableName == NULL) {
+            $tableName = $this->tableName;
         }
-        return $conn->query($query);
+
+        $query = "SELECT * FROM $tableName WHERE id=$id";
+        return $this->conn->query($query);
     }
 
     function GetDepartments() {
-        $conn = $this->GetConnection();
- 
         $query = "SELECT ID, Bezeichnung FROM Abteilung";
-        return $conn->query($query);
+        return $this->conn->query($query);
     }
 
     function ParseInput($data) {

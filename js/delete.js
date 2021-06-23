@@ -1,11 +1,11 @@
-function deleteEmployee(id) {
-  var employee = document.getElementById("employee-" + id);
+function deleteEntry(id, db) {
+  var employee = document.getElementById("row-" + id);
   employee.remove();
 
   // löschen in DB
   $.ajax({
-    url: "deleteEmployee.php",
+    url: "deleteEntry.php",
     type: "POST",
-    data: { id: id },
+    data: { id: id, db: db },
   });
 }

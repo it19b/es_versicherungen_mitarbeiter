@@ -5,8 +5,8 @@
 
     include 'SQL.php';
 
-    $sql = new SQL;
+    $sql = new SQL($_POST['db']);
     $id = $_POST['id'];
-    $sql->DeleteEmployee($id);
+    $sql->DeleteEntry($id);
 
 }

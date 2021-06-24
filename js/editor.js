@@ -1,14 +1,28 @@
 function changeEditButton(elem) {
-  if (elem.dataset.editing > 0) {
-    elem.innerText = "✎";
+  if (elem.dataset.editing >= 0) {
     form = document.getElementById("form-" + elem.dataset.id);
     sendFormData(form);
-    form.remove();
+
+    if (elem.dataset.id == 0) {
+       // Reset Fields
+      formElements = document.querySelectorAll("input[data-field_id='0']")
+      tr = document.createElement("tr")
+
+      for (var i = 0; i < formElements.length; i++) {
+        formElement = formElements[i];
+        formElement.value = "";
+      }
+    } else {
+      elem.innerText = "✎";
+      form.remove();
+    }
   } else {
     elem.innerText = "✓";
   }
   elem.dataset.editing *= -1;
-  changeFields(elem, elem.dataset.editing);
+  if (elem.dataset.editing != 0) {
+    changeFields(elem, elem.dataset.editing);
+  }
 }
 
 function changeFields(elem, editing) {
@@ -34,7 +48,6 @@ function changeFields(elem, editing) {
   }
 
   // skip first element, because it is the primary key
-
   for (var i = 1; i < list.length; i++) {
     element = list[i];
 
@@ -56,7 +69,7 @@ function changeFields(elem, editing) {
         id: `${fieldName}-${elemId}`,
       });
 
-      inputField = `<input type="${fieldType}" data-field_id="${elemId}" name="${fieldName}" value=${text} onchange='changeInput(this)'>`;
+      inputField = `<input type="${fieldType}" data-field_id="${elemId}" name="${fieldName}" value=${text} required onchange='changeInput(this)'>`;
       element.innerHTML = inputField;
     } else {
       element.innerHTML = element.querySelector("input").value;
@@ -77,6 +90,7 @@ function setAttributes(el, attrs) {
 }
 
 function sendFormData(form) {
+  console.log(form)
   var request = new XMLHttpRequest();
   request.open("POST", "submitForm.php");
   request.send(new FormData(form));

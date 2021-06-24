@@ -15,7 +15,13 @@
 
   .td-edit {
     text-align: center;
-    max-width: 50px;
+    min-width: 150px;
+  }
+
+  button {
+    min-width: 50px;
+    padding: 5px;
+    font-size: 16px;
   }
 
   .active {
